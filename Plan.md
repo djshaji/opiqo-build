@@ -10,3 +10,11 @@ Generate workspace instructions for cross compiling and testing on Android platf
 - Create both static and shared libraries for Android
 - Put shared libraries in build/libs/{ABI}/
 - Put static libraries in build/obj/local/{ABI}/
+- Put Android.mk in scripts/{project name}/Android.mk for each project in libs/core
+
+
+## Build Instructions
+1. Use Android.mk and Application.mk to define the build configuration for Android
+2. Use ndk-build command to build the libraries for Android
+3. Specify the target ABI (armeabi-v7a, arm64-v8a, x86, x86_64) in the build scripts
+4. Ensure that the built libraries are placed in the correct directories (build/libs/{ABI}/ for shared libraries and build/obj/local/{ABI}/ for static libraries)
