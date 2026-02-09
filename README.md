@@ -20,6 +20,14 @@ This project provides build infrastructure to compile LV2 audio plugin host libr
 
 ```
 opiqo-build/
+├── jni/
+│   ├── Android.mk          # Top-level makefile
+│   ├── Application.mk      # Global build configuration
+│   ├── zix/Android.mk
+│   ├── serd/Android.mk
+│   ├── sord/Android.mk
+│   ├── sratom/Android.mk
+│   └── lilv/Android.mk
 ├── libs/
 │   └── core/          # Core library source code
 │       ├── zix/
@@ -27,15 +35,10 @@ opiqo-build/
 │       ├── sord/
 │       ├── sratom/
 │       └── lilv/
-├── scripts/
-│   └── {project}/     # Build scripts for each library
-│       └── Android.mk # Android makefile for each project
-├── build/
-│   ├── libs/{ABI}/    # Shared libraries output (.so files)
-│   └── obj/local/{ABI}/ # Static libraries and object files
-├── tests/
-│   └── android/       # Android test scripts
-└── Application.mk     # Global Android build configuration
+├── libs/{ABI}/        # Shared libraries output (.so files)
+├── obj/local/{ABI}/   # Static libraries and object files
+└── tests/
+   └── android/       # Android test scripts
 ```
 
 ## Build Instructions
@@ -48,7 +51,7 @@ opiqo-build/
    export PATH=$NDK_HOME:$PATH
    ```
 
-2. **Configure target ABI** in `Application.mk`:
+2. **Configure target ABI** in `jni/Application.mk`:
    - `armeabi-v7a` - 32-bit ARM (legacy devices)
    - `arm64-v8a` - 64-bit ARM (modern devices, recommended)
    - `x86` - 32-bit Intel (emulator)
@@ -59,39 +62,38 @@ opiqo-build/
    ndk-build
    ```
 
-4. **Build specific library:**
+4. **Build specific ABI:**
    ```bash
-   ndk-build -C scripts/{library_name}
+   ndk-build APP_ABI=arm64-v8a
    ```
 
-### Build Output
+## Build Output
 
-- **Shared libraries (.so)**: `build/libs/{ABI}/`
-- **Static libraries (.a)**: `build/obj/local/{ABI}/`
+- **Shared libraries (.so)**: `libs/{ABI}/`
+- **Static libraries (.a)**: `obj/local/{ABI}/`
 
 Example output structure:
 ```
-build/
-├── libs/
-│   └── arm64-v8a/
-│       ├── libzix.so
-│       ├── libserd.so
-│       ├── libsord.so
-│       ├── libsratom.so
-│       └── liblilv.so
-└── obj/
-    └── local/
-        └── arm64-v8a/
-            ├── libzix.a
-            ├── libserd.a
-            ├── libsord.a
-            ├── libsratom.a
-            └── liblilv.a
+libs/
+└── arm64-v8a/
+   ├── libzix.so
+   ├── libserd.so
+   ├── libsord.so
+   ├── libsratom.so
+   └── liblilv.so
+obj/
+└── local/
+   └── arm64-v8a/
+      ├── libzix.a
+      ├── libserd.a
+      ├── libsord.a
+      ├── libsratom.a
+      └── liblilv.a
 ```
 
 ## Android.mk Configuration
 
-Each library in `scripts/{project_name}/Android.mk` defines:
+Each library in `jni/{project_name}/Android.mk` defines:
 - Source files
 - Include directories
 - Dependencies on other libraries
@@ -100,7 +102,7 @@ Each library in `scripts/{project_name}/Android.mk` defines:
 
 ## Application.mk Configuration
 
-Top-level `Application.mk` defines:
+Top-level `jni/Application.mk` defines:
 - Target Android API level
 - Target ABIs
 - STL library selection
@@ -173,8 +175,8 @@ Library build order (dependencies must be built first):
 ## Supported Android Versions
 
 - **Minimum API Level**: 21 (Android 5.0 Lollipop)
-- **Target API Level**: 28+ (Android 9.0 Pie or later)
-- **Recommended**: API 28+ for best compatibility
+- **Target API Level**: 34 (Android 14)
+- **Recommended**: API 34 unless you need to target older devices
 
 ## Build System
 
