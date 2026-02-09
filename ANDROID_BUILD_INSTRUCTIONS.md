@@ -2,8 +2,6 @@
 
 This guide provides step-by-step instructions for creating Android.mk and Application.mk files to build the opiqo-build libraries (zix, serd, sord, sratom, lilv) for Android using ndk-build.
 
-Target API Level 34
-
 ## Directory Structure
 
 ```
@@ -41,7 +39,7 @@ Create `jni/Application.mk` with global build settings:
 # Application.mk - Global Android build configuration
 
 # Target Android API level (minimum 21 for 64-bit support)
-APP_PLATFORM := android-21
+APP_PLATFORM := android-34
 
 # Target ABIs (architectures)
 APP_ABI := armeabi-v7a arm64-v8a x86 x86_64
@@ -52,8 +50,8 @@ APP_STL := c++_shared
 # Build mode (release or debug)
 APP_OPTIM := release
 
-# Enable C++11 features
-APP_CPPFLAGS := -std=c++11 -fexceptions -frtti
+# Enable C++17 features
+APP_CPPFLAGS := -std=c++17 -fexceptions -frtti
 
 # Global compiler flags
 APP_CFLAGS := -O2 -DANDROID -D_ANDROID_ -fPIC
@@ -74,6 +72,14 @@ Build libraries in dependency order:
 4. **sratom** (depends on sord, serd, zix)
 5. **lilv** (depends on all above)
 
+## CLI Tools Excluded
+
+The source lists below intentionally exclude command-line tool entry points so the Android builds only produce libraries. The currently excluded CLI sources are:
+
+- `libs/core/serd/src/serdi.c`
+- `libs/core/sord/src/sordi.c`
+- `libs/core/sord/src/sord_validate.c`
+
 ## 1. ZIX Library
 
 Create `jni/zix/Android.mk`:
@@ -93,15 +99,14 @@ LOCAL_SRC_FILES := \
     ../../libs/core/zix/src/btree.c \
     ../../libs/core/zix/src/bump_allocator.c \
     ../../libs/core/zix/src/digest.c \
-    ../../libs/core/zix/src/environment.c \
+    ../../libs/core/zix/src/errno_status.c \
     ../../libs/core/zix/src/filesystem.c \
     ../../libs/core/zix/src/hash.c \
     ../../libs/core/zix/src/path.c \
     ../../libs/core/zix/src/ring.c \
-    ../../libs/core/zix/src/sem.c \
     ../../libs/core/zix/src/status.c \
-    ../../libs/core/zix/src/string_util.c \
-    ../../libs/core/zix/src/thread.c \
+    ../../libs/core/zix/src/string_view.c \
+    ../../libs/core/zix/src/system.c \
     ../../libs/core/zix/src/tree.c
 
 # Include directories
@@ -137,15 +142,14 @@ LOCAL_SRC_FILES := \
     ../../libs/core/zix/src/btree.c \
     ../../libs/core/zix/src/bump_allocator.c \
     ../../libs/core/zix/src/digest.c \
-    ../../libs/core/zix/src/environment.c \
+    ../../libs/core/zix/src/errno_status.c \
     ../../libs/core/zix/src/filesystem.c \
     ../../libs/core/zix/src/hash.c \
     ../../libs/core/zix/src/path.c \
     ../../libs/core/zix/src/ring.c \
-    ../../libs/core/zix/src/sem.c \
     ../../libs/core/zix/src/status.c \
-    ../../libs/core/zix/src/string_util.c \
-    ../../libs/core/zix/src/thread.c \
+    ../../libs/core/zix/src/string_view.c \
+    ../../libs/core/zix/src/system.c \
     ../../libs/core/zix/src/tree.c
 
 LOCAL_C_INCLUDES := \
@@ -180,7 +184,6 @@ LOCAL_MODULE_FILENAME := libserd
 
 # Source files
 LOCAL_SRC_FILES := \
-    ../../libs/core/serd/src/attributes.c \
     ../../libs/core/serd/src/base64.c \
     ../../libs/core/serd/src/byte_source.c \
     ../../libs/core/serd/src/env.c \
@@ -216,7 +219,6 @@ LOCAL_MODULE := serd_static
 LOCAL_MODULE_FILENAME := libserd
 
 LOCAL_SRC_FILES := \
-    ../../libs/core/serd/src/attributes.c \
     ../../libs/core/serd/src/base64.c \
     ../../libs/core/serd/src/byte_source.c \
     ../../libs/core/serd/src/env.c \
@@ -374,17 +376,25 @@ LOCAL_MODULE_FILENAME := liblilv
 
 LOCAL_SRC_FILES := \
     ../../libs/core/lilv/src/collections.c \
+    ../../libs/core/lilv/src/dylib.c \
     ../../libs/core/lilv/src/instance.c \
     ../../libs/core/lilv/src/lib.c \
+    ../../libs/core/lilv/src/load_skimmer.c \
     ../../libs/core/lilv/src/node.c \
+    ../../libs/core/lilv/src/node_hash.c \
+    ../../libs/core/lilv/src/node_skimmer.c \
     ../../libs/core/lilv/src/plugin.c \
     ../../libs/core/lilv/src/pluginclass.c \
     ../../libs/core/lilv/src/port.c \
     ../../libs/core/lilv/src/query.c \
     ../../libs/core/lilv/src/scalepoint.c \
     ../../libs/core/lilv/src/state.c \
+    ../../libs/core/lilv/src/string_util.c \
+    ../../libs/core/lilv/src/syntax_skimmer.c \
+    ../../libs/core/lilv/src/sys_util.c \
+    ../../libs/core/lilv/src/type_skimmer.c \
     ../../libs/core/lilv/src/ui.c \
-    ../../libs/core/lilv/src/util.c \
+    ../../libs/core/lilv/src/uris.c \
     ../../libs/core/lilv/src/world.c
 
 LOCAL_C_INCLUDES := \
@@ -412,17 +422,25 @@ LOCAL_MODULE_FILENAME := liblilv
 
 LOCAL_SRC_FILES := \
     ../../libs/core/lilv/src/collections.c \
+    ../../libs/core/lilv/src/dylib.c \
     ../../libs/core/lilv/src/instance.c \
     ../../libs/core/lilv/src/lib.c \
+    ../../libs/core/lilv/src/load_skimmer.c \
     ../../libs/core/lilv/src/node.c \
+    ../../libs/core/lilv/src/node_hash.c \
+    ../../libs/core/lilv/src/node_skimmer.c \
     ../../libs/core/lilv/src/plugin.c \
     ../../libs/core/lilv/src/pluginclass.c \
     ../../libs/core/lilv/src/port.c \
     ../../libs/core/lilv/src/query.c \
     ../../libs/core/lilv/src/scalepoint.c \
     ../../libs/core/lilv/src/state.c \
+    ../../libs/core/lilv/src/string_util.c \
+    ../../libs/core/lilv/src/syntax_skimmer.c \
+    ../../libs/core/lilv/src/sys_util.c \
+    ../../libs/core/lilv/src/type_skimmer.c \
     ../../libs/core/lilv/src/ui.c \
-    ../../libs/core/lilv/src/util.c \
+    ../../libs/core/lilv/src/uris.c \
     ../../libs/core/lilv/src/world.c
 
 LOCAL_C_INCLUDES := \
