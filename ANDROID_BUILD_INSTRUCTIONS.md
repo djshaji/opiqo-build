@@ -2,6 +2,8 @@
 
 This guide provides step-by-step instructions for creating Android.mk and Application.mk files to build the opiqo-build libraries (zix, serd, sord, sratom, lilv) for Android using ndk-build.
 
+Target API Level 34
+
 ## Directory Structure
 
 ```
